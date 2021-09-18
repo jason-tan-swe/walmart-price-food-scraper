@@ -69,20 +69,18 @@ const scrapeProduct = (async (ingredient) => {
     // Check if the ingredient was valid
     if (productsInfo.length === 0) {
         await browser.close();
+        // Funny error message: When puppeteer gives up it just stops here, otherwise
+        // it'll try to keep running until either this is returned or the food
         return { message: `The ingredient: '${ingredient}' is not valid.` }
     }
 
-    // For now, check if the first three are valid 'ingredients'
-    for (const product of productsInfo.slice(0, 3)){
-        if (!(product.name.toLowerCase().includes(ingredient))){
-            return { message: `The ingredient (${ ingredient }) did not match on Walmart.` }
-        }
-    }
     return productsInfo.slice(0,3);
 });
 
 (async () => {
-    const p = await scrapeProduct('chicken');
+    const p = await scrapeProduct('grapes');
     console.log(p);
     process.exit(0);
 })();
+
+module.exports = scrapeProduct;

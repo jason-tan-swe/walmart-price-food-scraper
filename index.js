@@ -12,7 +12,10 @@ const args = [
     ];
 
 
-(async () => {
+const scrapeProduct = (async () => {
+    // Get passed-in data
+    const ingredient = '3';
+
     // Start puppeteer
     const browser = await puppeteer.launch({
         headless: false,
@@ -21,28 +24,48 @@ const args = [
 
     // Create a new page to walmart
     const page = await browser.newPage();
+    const popularQuery = '&sort=Popular%3ADESC';
     await Promise.all([
-        // TODO: Create a route string for any specific
-        // ingredient (SENT TO US!)
-        page.goto('https://www.walmart.ca/search?q=apple'),
+        // Go to the ingredient with the popular query
+        page.goto(`https://www.walmart.ca/search?q=${ingredient}${popularQuery}`),
         page.waitForNavigation(),
     ]);
 
-    // Get the items
-    const itemInfo = await page.evaluate(() => {
-        // Path to items
+    // Perform HTML queries to get all the 'products' on the page
+    const items = await page.evaluate(() => {
         const divs = document.querySelectorAll("div[data-automation='product']");
-        const productRef = Array.from(divs)[0].children[0].children[0].children[1];
-        const productText = productRef.children[1].children[0].innerText;
-        const productPrice = productRef.children[2].children[0].children[0].children[0].children[0].innerText
-        return {productText, productPrice};
+        return Array.from(divs).map((div => div.children[0].children[0].children[1].innerText));
     });
-    // For debugging
-    console.log(itemInfo.productText, itemInfo.productPrice);
 
-    // TODO: Instead of getting one item,
-    // loop through all possible items and
-    // check to see if ingredient SENT TO US
-    // is inside any of the content (return first one for now!)
+    // Initialize JSON for returning ingredients
+    const productsInfo = [];
 
-})();
+    // Iterate through each product
+    for (const item of items){
+        // Parse the product to get the price(s) parts
+        const itemInfo = item.split('\n');
+        const priceParsed = itemInfo.filter(item => {
+           return (item.includes('¢') || item.includes('$'));
+        });
+
+        // Name of the product always found at zero'th index
+        const itemName = itemInfo[0];
+
+        // Add to the array of products available
+        productsInfo.push({
+            name: itemName,
+            price: priceParsed[0],
+            ppg: priceParsed[1] ? priceParsed[1] : 'NA',
+        });
+    }
+    console.log(productsInfo);
+    console.log(page.url().includes('blocked'));
+    // TODO: Check if the ingredients is null!
+
+
+    // For now, check if the first three are valid 'ingredients'
+
+
+});
+
+scrapeProduct();

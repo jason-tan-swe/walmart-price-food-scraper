@@ -8,20 +8,19 @@ const args = [
     '--window-position=0,0',
     '--ignore-certifcate-errors',
     '--ignore-certifcate-errors-spki-list',
-    // '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.0 Safari/537.36"'
+    '--user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36"'
     ];
 
 
 const scrapeProduct = (async (ingredient) => {
     // Start puppeteer
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         args
     });
 
     // Set user-agent based on system
     const page = await browser.newPage();
-    await page.setUserAgent(await browser.userAgent());
 
     // Create a new page to walmart
     const popularQuery = '&sort=Popular%3ADESC';
@@ -30,7 +29,7 @@ const scrapeProduct = (async (ingredient) => {
         page.goto(`https://www.walmart.ca/search?q=${ingredient}${popularQuery}`),
         page.waitForNavigation(),
     ]);
-
+    
     // Perform HTML queries to get all the 'products' on the page
     const items = await page.evaluate(() => {
         const divs = document.querySelectorAll("div[data-automation='product']");

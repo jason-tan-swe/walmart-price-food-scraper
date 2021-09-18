@@ -1,0 +1,16 @@
+{
+  "name": "puppeteer-test",
+  "version": "1.0.0",
+  "description": "To learn how to use puppeteer to navigate a website to find local flyers/prices",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.4",
+    "puppeteer": "^10.2.0"
+  }
+}

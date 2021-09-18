@@ -59,7 +59,21 @@ const scrapeProduct = (async () => {
         });
     }
     console.log(productsInfo);
-    console.log(page.url().includes('blocked'));
+    
+    // Check if the page got blocked
+    if (page.url().includes('blocked')){
+        // Restart the browser
+        await browser.close();
+        await scrapeProduct();
+    }
+
+    // Check if the ingredient was valid
+    if (productsInfo.length === 0) {
+        await browser.close();
+        return {message: `The ingredient: '${ingredient}' is not valid.`}
+    }
+
+
     // TODO: Check if the ingredients is null!
 
 
@@ -68,4 +82,7 @@ const scrapeProduct = (async () => {
 
 });
 
-scrapeProduct();
+(async () => {
+    const p = await scrapeProduct();
+    console.log(p);
+})();
